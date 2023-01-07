@@ -9,7 +9,7 @@ const router = express.Router();
 router
   .route('/')
   .get(tourController.getAllTours)
-  .post(tourController.checkBody, tourController.createTour); // we can add multiple middleware
+  .post(tourController.createTour); // we can add multiple middleware
 router
   .route('/:id')
   .get(tourController.getTour)
