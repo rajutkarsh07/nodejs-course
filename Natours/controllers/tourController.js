@@ -1,10 +1,17 @@
 const Tour = require('./../models/tourModel');
 
+exports.aliasTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingAverage,price';
+  req.query.fields = 'name,price,ratingAverage,summary,difficulty';
+  next();
+};
+
 exports.getAllTours = async (req, res) => {
   // console.log(req.requestTIme);
   try {
     console.log(req.query);
-    //filtering
+    // 1a) filtering
 
     // console.log(req.query); this returns object that is written in param here it is 127.0.0.1:4000/api/v1/tours?duration=5&difficulty=easy
     // const tours = await Tour.find(); this will get all the tours
@@ -17,7 +24,7 @@ exports.getAllTours = async (req, res) => {
 
     //first build the query
 
-    //advanced filtering
+    // 1b) advanced filtering
 
     //gte, gt, lte, lt
     //{difficulty : 'easy', duration : { $gte: 5 } } we want this
@@ -27,7 +34,36 @@ exports.getAllTours = async (req, res) => {
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     // const query = Tour.find(queryObj);
-    const query = Tour.find(JSON.parse(queryObj));
+    let query = Tour.find(JSON.parse(queryStr));
+
+    // 2) Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
+
+    // 3) Field limiting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v'); //excluding __v as it gets created by mongoose idk why
+    }
+
+    // 4) Pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 10;
+    const skip = (page - 1) * limit;
+
+    //page=3&limit=10, means page 1 is 1-10, page 2 is 11-20
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) throw new Error('Page does not exist');
+    }
 
     //then attach await
     const tours = await query;
