@@ -18,7 +18,7 @@ app.use(express.static(`${__dirname}/public`)); //it will save public as root fo
 //this middleware applies to each and every request
 //.route is also a middleware but it only work for one request
 app.use((req, res, next) => {
-  console.log('this is middleware');
+  // console.log('this is middleware');
   next();
 });
 
