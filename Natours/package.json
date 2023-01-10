@@ -13,7 +13,9 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mongoose": "^5.13.15",
-    "nodeenv": "^3.0.75"
+    "nodeenv": "^3.0.75",
+    "slugify": "^1.6.5",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "eslint": "^8.29.0",
