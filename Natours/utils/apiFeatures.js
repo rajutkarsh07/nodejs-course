@@ -9,9 +9,9 @@ class APIFeatures {
     // console.log(req.query); this returns object that is written in param here it is 127.0.0.1:4000/api/v1/tours?duration=5&difficulty=easy
     // const tours = await Tour.find(); this will get all the tours
 
-    const queryObj = { ...this.queryString };
-    const excludeFiles = ['page', 'sort', 'limit', 'fields'];
-    excludeFiles.forEach((e) => delete queryObj[e]);
+    const queryObj = { ...this.queryString }; //we will store all the fields from the params
+    const excludeFiles = ['page', 'sort', 'limit', 'fields']; //we want all the fields from the params excluding these fields
+    excludeFiles.forEach((e) => delete queryObj[e]); // delete all the non required fileds from the object
 
     // 1b) advanced filtering
 
@@ -31,7 +31,7 @@ class APIFeatures {
 
   sort() {
     if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(',').join(' ');
+      const sortBy = this.queryString.sort.split(',').join(' '); //for this type of params sortBy=rating,price
       this.query = this.query.sort(sortBy);
     } else {
       this.query = this.query.sort('-createdAt');
@@ -45,7 +45,7 @@ class APIFeatures {
       const fields = this.queryString.fields.split(',').join(' ');
       this.query = this.query.select(fields);
     } else {
-      this.query = this.query.select('-__v'); //excluding __v as it gets created by mongoose idk why
+      this.query = this.query.select('-__v'); //excluding __v by using - sign as it gets created by mongoose idk why
     }
 
     return this;

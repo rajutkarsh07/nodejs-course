@@ -143,11 +143,11 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
 });
 
 exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
-  const year = req.params.year * 1;
+  const year = req.params.year * 1; //router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan); we are passing year by using param /:year
 
   const plan = await Tour.aggregate([
     {
-      $unwind: '$startDates',
+      $unwind: '$startDates', // to separate different elements of an array
     },
     {
       $match: {
@@ -160,8 +160,8 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     {
       $group: {
         _id: { $month: '$startDates' },
-        numTourStarts: { $sum: 1 },
-        tours: { $push: '$name' },
+        numTourStarts: { $sum: 1 }, // adding the number of tour in that month
+        tours: { $push: '$name' }, //pushing the name of tour in the array
       },
     },
     {
@@ -169,7 +169,7 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     },
     {
       $project: {
-        _id: 0,
+        _id: 0, // to hide id
       },
     },
     {

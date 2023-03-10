@@ -82,18 +82,21 @@ const tourSchema = new mongoose.Schema(
     },
   },
   {
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+    toJSON: { virtuals: true }, //making virtual visible in json
+    toObject: { virtuals: true }, //making virtual visible in object
   }
 );
+
+//we cannot use this virtual property here in a query, because they're technically not part of the database.
 
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
-// document middleware: runs before .save() and .create()
+// mongoose document middleware: runs before .save() and .create()
+// pre save only trigerred by .save() and .create() not by any other function like findById
 tourSchema.pre('save', function (next) {
-  this.slug = slugify(this.name, { lower: true }); //this has access to currently being saved document
+  this.slug = slugify(this.name, { lower: true }); //this will slugify the name and make all the text to lowercase this has access to currently being saved document
   next();
 });
 
@@ -104,16 +107,18 @@ tourSchema.pre('save', function (next) {
 
 // post will be executed after all the pre middleware have completed
 // tourSchema.post('save', function (doc, next) {
-//   console.log(doc);
+//   console.log(doc); // this will print the doc/jsonObj which we have posted
 //   next();
 // });
 
 // query middleware
+
 // find query will point to current query not current document
 tourSchema.pre(/^find/, function (next) {
   // /^find will trigger all the commands that starts with find eg findOne, findXYZ etc.
+  // as we want this to trigger to findOne method also that's why we have used /^find/ instead of creating two pre 'find' and 'findOne'
   // tourSchema.pre('find', function (next) {
-  this.find({ secretTour: { $ne: true } });
+  this.find({ secretTour: { $ne: true } }); // this will hide all the secretTour that is true and return a json obj without secretTour obj but our database will have all the json obj including that one which has secretTour
   this.start = Date.now();
   next();
 });
@@ -126,9 +131,10 @@ tourSchema.post(/^find/, function (docs, next) {
 
 // Aggregation middleware
 //this runs before and after the execution
+// we want to hide the secret key from aggregrate middleware also
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); // unshift to add at the beginning of the array
-  // console.log(this.pipeline());
+  // console.log(this.pipeline()); // this will show the aggregrate array which we have defined
   next();
 });
 

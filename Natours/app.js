@@ -28,6 +28,7 @@ app.use(express.static(`${__dirname}/public`)); //it will save public as root fo
 app.use((req, res, next) => {
   req.requestTIme = new Date().toISOString();
   // console.log(req.requestTIme);
+  console.log(req.headers);
   next();
 });
 
