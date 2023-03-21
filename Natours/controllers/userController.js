@@ -25,6 +25,9 @@ exports.getAllUsers = catchAsync(async (req, res) => {
       users,
     },
   });
+  console.log('-----------aaj ka taarikh----------');
+  let taarikh = new Date(Date.now() + 90 * 1000 * 24 * 60 * 60);
+  console.log(taarikh);
 });
 
 exports.updateMe = catchAsync(async (req, res, next) => {
